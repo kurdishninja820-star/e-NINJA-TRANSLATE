@@ -1,0 +1,630 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10152d">
+<title>NINJA TRANSLATE</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+font-family:Arial,sans-serif;
+background:#0b1020;color:white;
+min-height:100vh;padding:16px;
+}
+.app{max-width:650px;margin:auto}
+header{
+display:flex;justify-content:space-between;
+align-items:center;padding:15px 0 25px
+}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{
+width:48px;height:48px;border-radius:15px;
+background:linear-gradient(135deg,#7048ff,#18c9e8);
+display:grid;place-items:center;font-size:25px
+}
+.logo h2{font-size:19px;letter-spacing:1px}
+.logo p{color:#929ab7;font-size:10px;margin-top:4px}
+button,select{cursor:pointer}
+.theme,.small-btn,.actions button{
+background:#263451;color:white;border:1px solid #405075;
+border-radius:11px;padding:11px
+}
+.hero{text-align:center;padding:20px 5px 25px}
+.hero h1{
+font-size:29px;
+background:linear-gradient(90deg,#9a7aff,#25d5f0);
+background-clip:text;-webkit-background-clip:text;
+color:transparent
+}
+.hero p{color:#939dbb;font-size:13px;margin-top:12px}
+.language-box{
+background:#171f38;border:1px solid #303c60;
+border-radius:18px;padding:13px;
+display:flex;align-items:center;gap:8px
+}
+.language-box select{
+background:#242e4b;color:white;
+border:1px solid #405075;padding:13px 5px;
+border-radius:11px;flex:1;min-width:0;font-size:12px
+}
+.swap{
+background:linear-gradient(135deg,#7451ff,#20bde9);
+border:0;width:43px;height:43px;
+border-radius:13px;color:white;font-size:22px
+}
+.panel{
+margin-top:16px;background:#151d34;
+border:1px solid #303b5d;border-radius:18px;overflow:hidden
+}
+.panel-title{
+display:flex;justify-content:space-between;
+padding:16px;color:#a9b4d4;font-size:13px
+}
+textarea{
+width:100%;height:145px;background:transparent;
+border:0;outline:0;resize:vertical;color:white;
+padding:0 16px;font-size:17px;line-height:1.8
+}
+textarea::placeholder{color:#697594}
+.panel-bottom{
+display:flex;justify-content:space-between;
+align-items:center;padding:12px 15px;
+border-top:1px solid #293450;color:#8995b5;font-size:12px
+}
+.translate-btn{
+margin-top:18px;width:100%;border:0;border-radius:15px;
+padding:17px;color:white;font-size:17px;font-weight:bold;
+background:linear-gradient(110deg,#7050ff,#268de9,#15c5d5)
+}
+.translate-btn:disabled{opacity:.6}
+.result{
+min-height:140px;padding:18px;font-size:17px;
+line-height:1.9;overflow-wrap:anywhere;white-space:pre-wrap
+}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.actions button{font-size:12px}
+.status{text-align:center;padding:13px;color:#9ba8c9;font-size:13px}
+.section{margin-top:27px}
+.section h3{font-size:17px;margin-bottom:14px}
+.history-item{
+background:#172039;border:1px solid #303d60;
+padding:14px;border-radius:13px;margin-bottom:10px;
+font-size:13px;line-height:1.8;overflow-wrap:anywhere
+}
+.history-item small{display:block;color:#8998bd;margin-bottom:7px}
+.history-item .translated{color:#70cfff}
+.footer{text-align:center;padding:30px 0;color:#65718e;font-size:12px}
+.light{background:#eef2ff;color:#18213c}
+.light .panel,.light .language-box,.light .history-item{
+background:white;border-color:#d8def0
+}
+.light textarea{color:#18213c}
+.light .language-box select{background:#e8edfa;color:#18213c}
+.light .panel-title,.light .panel-bottom{color:#526080}
+.light .small-btn,.light .actions button,.light .theme{
+background:#e3e9fa;color:#18213c
+}
+@media(max-width:380px){
+body{padding:10px}
+.hero h1{font-size:25px}
+.language-box{gap:5px}
+.language-box select{font-size:11px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+<div class="logo">
+<div class="logo-icon">忍</div>
+<div>
+<h2>NINJA TRANSLATE</h2>
+<p>SMART LANGUAGE TRANSLATOR</p>
+</div>
+</div>
+<button class="theme" onclick="toggleTheme()">☀️</button>
+</header>
+
+<div class="hero">
+<h1>Translate Everything 🌍</h1>
+<p>Translate the world in one place</p>
+</div>
+
+<div class="language-box">
+<select id="source">
+<option value="auto">Auto Detect</option>
+</select>
+<button class="swap" onclick="swapLanguages()">⇄</button>
+<select id="target"></select>
+</div>
+
+<div class="panel">
+<div class="panel-title">
+<span>📝 Your Text</span>
+<span id="count">0 / 5000</span>
+</div>
+<textarea id="input" maxlength="5000"
+placeholder="Write or paste your text here..."></textarea>
+<div class="panel-bottom">
+<span>INPUT TEXT</span>
+<div>
+<button class="small-btn" onclick="startVoice()">🎤 Voice</button>
+<button class="small-btn" onclick="clearInput()">✕</button>
+</div>
+</div>
+</div>
+
+<button class="translate-btn" id="translate"
+onclick="translateText()">✨ TRANSLATE NOW</button>
+
+<div class="panel">
+<div class="panel-title">
+<span>🌐 Translation</span>
+<span>OUTPUT</span>
+</div>
+<div class="result" id="output">
+Your translation appears here...
+</div>
+<div class="panel-bottom actions">
+<button onclick="copyResult()">📋 Copy</button>
+<button onclick="speakResult()">🔊 Speak</button>
+<button onclick="clearResult()">🗑 Clear</button>
+</div>
+</div>
+
+<div class="status" id="status">🟢 Ready to translate</div>
+
+<div class="section">
+<h3>🕘 Translation History</h3>
+<div id="history"></div>
+<button class="small-btn" onclick="clearHistory()">Clear History</button>
+</div>
+
+<div class="footer">
+<p>NINJA TRANSLATE</p>
+<p>VERSION 1.0 • 100+ LANGUAGES</p>
+</div>
+
+</div>
+
+<script>
+
+// ALL LANGUAGES
+
+const languages = [
+["af","Afrikaans"],
+["sq","Albanian"],
+["am","Amharic"],
+["ar","Arabic"],
+["hy","Armenian"],
+["as","Assamese"],
+["ay","Aymara"],
+["az","Azerbaijani"],
+["eu","Basque"],
+["be","Belarusian"],
+["bn","Bengali"],
+["bho","Bhojpuri"],
+["bs","Bosnian"],
+["bg","Bulgarian"],
+["my","Burmese"],
+["ca","Catalan"],
+["ceb","Cebuano"],
+["zh-CN","Chinese Simplified"],
+["zh-TW","Chinese Traditional"],
+["co","Corsican"],
+["hr","Croatian"],
+["cs","Czech"],
+["da","Danish"],
+["dv","Dhivehi"],
+["doi","Dogri"],
+["nl","Dutch"],
+["en","English"],
+["eo","Esperanto"],
+["et","Estonian"],
+["ee","Ewe"],
+["fil","Filipino"],
+["fi","Finnish"],
+["fr","French"],
+["fy","Frisian"],
+["gl","Galician"],
+["ka","Georgian"],
+["de","German"],
+["el","Greek"],
+["gn","Guarani"],
+["gu","Gujarati"],
+["ht","Haitian Creole"],
+["ha","Hausa"],
+["haw","Hawaiian"],
+["he","Hebrew"],
+["hi","Hindi"],
+["hmn","Hmong"],
+["hu","Hungarian"],
+["is","Icelandic"],
+["ig","Igbo"],
+["ilo","Ilocano"],
+["id","Indonesian"],
+["ga","Irish"],
+["it","Italian"],
+["ja","Japanese"],
+["jv","Javanese"],
+["kn","Kannada"],
+["kk","Kazakh"],
+["km","Khmer"],
+["rw","Kinyarwanda"],
+["gom","Konkani"],
+["ko","Korean"],
+["kri","Krio"],
+["ku","Kurdish Kurmanji"],
+["ckb","Kurdish Sorani"],
+["ky","Kyrgyz"],
+["lo","Lao"],
+["la","Latin"],
+["lv","Latvian"],
+["ln","Lingala"],
+["lt","Lithuanian"],
+["lg","Luganda"],
+["lb","Luxembourgish"],
+["mk","Macedonian"],
+["mai","Maithili"],
+["mg","Malagasy"],
+["ms","Malay"],
+["ml","Malayalam"],
+["mt","Maltese"],
+["mi","Maori"],
+["mr","Marathi"],
+["mni-Mtei","Meiteilon"],
+["lus","Mizo"],
+["mn","Mongolian"],
+["ne","Nepali"],
+["no","Norwegian"],
+["ny","Nyanja"],
+["or","Odia"],
+["om","Oromo"],
+["ps","Pashto"],
+["fa","Persian"],
+["pl","Polish"],
+["pt","Portuguese"],
+["pa","Punjabi"],
+["qu","Quechua"],
+["ro","Romanian"],
+["ru","Russian"],
+["sm","Samoan"],
+["sa","Sanskrit"],
+["gd","Scots Gaelic"],
+["nso","Sepedi"],
+["sr","Serbian"],
+["st","Sesotho"],
+["sn","Shona"],
+["sd","Sindhi"],
+["si","Sinhala"],
+["sk","Slovak"],
+["sl","Slovenian"],
+["so","Somali"],
+["es","Spanish"],
+["su","Sundanese"],
+["sw","Swahili"],
+["sv","Swedish"],
+["tg","Tajik"],
+["ta","Tamil"],
+["tt","Tatar"],
+["te","Telugu"],
+["th","Thai"],
+["ti","Tigrinya"],
+["ts","Tsonga"],
+["tr","Turkish"],
+["tk","Turkmen"],
+["ak","Twi"],
+["uk","Ukrainian"],
+["ur","Urdu"],
+["ug","Uyghur"],
+["uz","Uzbek"],
+["vi","Vietnamese"],
+["cy","Welsh"],
+["xh","Xhosa"],
+["yi","Yiddish"],
+["yo","Yoruba"],
+["zu","Zulu"]
+];
+
+const source=document.getElementById("source");
+const target=document.getElementById("target");
+const input=document.getElementById("input");
+const output=document.getElementById("output");
+const statusText=document.getElementById("status");
+const translateBtn=document.getElementById("translate");
+
+// ADD ALL LANGUAGES TO MENUS
+
+languages.forEach(([code,name])=>{
+source.add(new Option(name,code));
+target.add(new Option(name,code));
+});
+
+source.value="auto";
+target.value="ckb";
+
+// CHARACTER COUNTER
+
+input.addEventListener("input",()=>{
+document.getElementById("count").textContent=
+input.value.length+" / 5000";
+});
+
+// TRANSLATION
+
+async function translateText(){
+
+const text=input.value.trim();
+
+if(!text){
+statusText.textContent="⚠️ Please enter text";
+return;
+}
+
+if(source.value===target.value){
+statusText.textContent="⚠️ Choose different languages";
+return;
+}
+
+translateBtn.disabled=true;
+translateBtn.textContent="⏳ TRANSLATING...";
+statusText.textContent="🔄 Connecting...";
+
+try{
+
+const url=
+"https://translate.googleapis.com/translate_a/single"+
+"?client=gtx&sl="+encodeURIComponent(source.value)+
+"&tl="+encodeURIComponent(target.value)+
+"&dt=t&q="+encodeURIComponent(text);
+
+const response=await fetch(url);
+
+if(!response.ok)throw new Error("Service unavailable");
+
+const data=await response.json();
+
+const translated=data[0].map(x=>x[0]||"").join("");
+
+if(!translated)throw new Error("No translation");
+
+output.textContent=translated;
+statusText.textContent="✅ Translation completed";
+
+saveHistory(text,translated);
+
+}catch(error){
+
+statusText.textContent=
+"❌ Translation failed. Check your internet.";
+
+}
+
+translateBtn.disabled=false;
+translateBtn.textContent="✨ TRANSLATE NOW";
+}
+
+// SWAP LANGUAGES
+
+function swapLanguages(){
+
+if(source.value==="auto"){
+statusText.textContent="Choose a source language first";
+return;
+}
+
+const old=source.value;
+source.value=target.value;
+target.value=old;
+
+const oldText=input.value;
+input.value=output.textContent;
+output.textContent=oldText;
+
+document.getElementById("count").textContent=
+input.value.length+" / 5000";
+}
+
+// CLEAR
+
+function clearInput(){
+input.value="";
+document.getElementById("count").textContent="0 / 5000";
+}
+
+function clearResult(){
+output.textContent="Your translation appears here...";
+}
+
+// COPY
+
+async function copyResult(){
+
+const text=output.textContent;
+
+if(!text||text==="Your translation appears here...")return;
+
+try{
+await navigator.clipboard.writeText(text);
+statusText.textContent="✅ Copied";
+}catch(e){
+const area=document.createElement("textarea");
+area.value=text;
+document.body.appendChild(area);
+area.select();
+document.execCommand("copy");
+area.remove();
+statusText.textContent="✅ Copied";
+}
+}
+
+// SPEAK
+
+function speakResult(){
+
+const text=output.textContent;
+
+if(!("speechSynthesis" in window)){
+statusText.textContent="Speech is not supported";
+return;
+}
+
+speechSynthesis.cancel();
+
+const voice=new SpeechSynthesisUtterance(text);
+
+const voiceLanguages={
+ckb:"ckb-IQ",
+ku:"ku-TR",
+en:"en-US",
+ar:"ar-SA",
+tr:"tr-TR",
+fa:"fa-IR"
+};
+
+voice.lang=voiceLanguages[target.value]||target.value;
+speechSynthesis.speak(voice);
+}
+
+// VOICE INPUT
+
+function startVoice(){
+
+const Recognition=
+window.SpeechRecognition||
+window.webkitSpeechRecognition;
+
+if(!Recognition){
+statusText.textContent="Voice recognition not supported";
+return;
+}
+
+const recognition=new Recognition();
+
+const voiceLanguages={
+ckb:"ckb-IQ",
+ku:"ku-TR",
+en:"en-US",
+ar:"ar-IQ",
+tr:"tr-TR",
+fa:"fa-IR"
+};
+
+recognition.lang=voiceLanguages[source.value]||"en-US";
+
+recognition.onstart=()=>{
+statusText.textContent="🎤 Listening...";
+};
+
+recognition.onresult=(event)=>{
+input.value=event.results[0][0].transcript;
+document.getElementById("count").textContent=
+input.value.length+" / 5000";
+statusText.textContent="✅ Voice received";
+};
+
+recognition.onerror=()=>{
+statusText.textContent="Voice error";
+};
+
+recognition.start();
+}
+
+// HISTORY
+
+function saveHistory(original,translated){
+
+let history=JSON.parse(
+localStorage.getItem("ninja_history")||"[]"
+);
+
+history.unshift({
+original:original,
+translated:translated,
+from:source.options[source.selectedIndex].text,
+to:target.options[target.selectedIndex].text
+});
+
+history=history.slice(0,30);
+
+localStorage.setItem("ninja_history",JSON.stringify(history));
+
+showHistory();
+}
+
+function showHistory(){
+
+const history=JSON.parse(
+localStorage.getItem("ninja_history")||"[]"
+);
+
+const container=document.getElementById("history");
+container.innerHTML="";
+
+history.forEach(item=>{
+
+const div=document.createElement("div");
+div.className="history-item";
+
+const small=document.createElement("small");
+small.textContent=item.from+" → "+item.to;
+
+const original=document.createElement("div");
+original.textContent=item.original;
+
+const translated=document.createElement("div");
+translated.className="translated";
+translated.textContent=item.translated;
+
+div.append(small,original,translated);
+
+div.onclick=()=>{
+input.value=item.original;
+output.textContent=item.translated;
+document.getElementById("count").textContent=
+input.value.length+" / 5000";
+window.scrollTo({top:0,behavior:"smooth"});
+};
+
+container.appendChild(div);
+
+});
+
+if(!history.length){
+container.textContent="No translation history yet.";
+}
+}
+
+function clearHistory(){
+localStorage.removeItem("ninja_history");
+showHistory();
+}
+
+// DARK / LIGHT MODE
+
+function toggleTheme(){
+
+document.body.classList.toggle("light");
+
+document.querySelector(".theme").textContent=
+document.body.classList.contains("light")?"🌙":"☀️";
+}
+
+// KEYBOARD SHORTCUT
+
+input.addEventListener("keydown",event=>{
+if(event.ctrlKey&&event.key==="Enter"){
+translateText();
+}
+});
+
+showHistory();
+
+</script>
+</body>
+</html>
